@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>
+      Fooling around with React
+    </title>
+  </head>
+
+  <body>
+    <div id="outlet">
+    </div>
+
+    <script src="https://fb.me/react-0.14.3.min.js"></script>
+    <script src="https://fb.me/react-dom-0.14.3.min.js"></script>
+    <script src="https://unpkg.com/redux@3.7.2/dist/redux.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-redux/5.0.7/react-redux.min.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+
+    <script type="text/babel">
+      var createStore = Redux.createStore;
+      var Provider = ReactRedux.Provider;
+      var connect = ReactRedux.connect;
+
+      var initialState = {
+        users: [],
+      }
+
+      var reducer = function(state, action) {
+        if(!state) {
+          return initialState;
+        }
+
+        switch(action.type) {
+          case 'push':
+            return Object.assign({}, state, {users: state.users.concat(action.user)});
+
+          case 'pop':
+            return Object.assign({}, state, {users: state.users.shift()});
+
+          default:
+            return state;
+        }
+      }
+
+      var store = createStore(reducer, initialState);
+
+      var App = React.createClass({
+        render: function() {
+         return(
+          <div>Hello From React</div>
+         )
+        }
+      });
+
+      ReactDOM.render(
+        <Provider store={store}>
+          <App />
+        </Provider>,
+        document.getElementById('outlet')
+      );
+    </script>
+  </body>
+</html>
