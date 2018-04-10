@@ -86,9 +86,13 @@
 
       var store = createStore(reducer, initialState);
 
+      var createScrewedUser = function() {
+        return {};
+      }
+
       var App = React.createClass({
         addUser: function() {
-          this.props.dispatch(addUser(createUser()));
+          this.props.dispatch(addUser(createScrewedUser()));
         },
 
         removeUser: function(id) {
@@ -110,11 +114,11 @@
                 </td>
 
                 <td>
-                  {user.firstName}
+                  {user.firstName.toUpperCase()}
                 </td>
 
                 <td>
-                  {user.lastName}
+                  {user.lastName.toUpperCase()}
                 </td>
 
                 <td>
