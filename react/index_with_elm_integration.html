@@ -106,8 +106,21 @@
         }
       });
 
+      var pong = function(ports, lastId) {
+        return function() {
+          ports.pong.send("PONG " + lastId);
+        }
+      }
+
+      var setupPorts = function(ports) {
+        ports.ping.subscribe(function(lastId){
+          console.log(lastId);
+          setTimeout(pong(ports, lastId), 1000)
+        });
+      }
+
       ReactDOM.render(
-        <ElmWrapper src={Elm.App} />,
+        <ElmWrapper src={Elm.App} ports={setupPorts}/>,
         document.getElementById('outlet')
       );
     </script>
