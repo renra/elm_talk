@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>
+      Fooling around with Elm
+    </title>
+  </head>
+
+  <body>
+    <div id="outlet">
+    </div>
+
+    <script src="./app.js"></script>
+
+    <script>
+      var outlet = document.getElementById('outlet');
+
+      Elm.App.embed(outlet, {
+        foo: 'foo'
+      });
+    </script>
+  </body>
+</html>
