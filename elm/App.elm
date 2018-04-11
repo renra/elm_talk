@@ -1,12 +1,16 @@
-module App exposing(..)
+port module App exposing(..)
 
-import Html exposing (Html, h1, text, div, table, thead, tbody, tr, th, td, button)
+import Html exposing (Html, h1, h2, text, div, table, thead, tbody, tr, th, td, button)
 import Html.Events exposing (onClick)
+
+port ping : Int -> Cmd msg
+port pong : (String -> msg) -> Sub msg
 
 
 type alias Model =
   { users: List User
   , lastId: Int
+  , messages: List String
   }
 
 type alias Flags =
@@ -29,18 +33,23 @@ createUser id =
 type Msg
   = CreateUser
   | RemoveUser Int
+  | Pong String
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Sub.none
+  pong (\message -> Pong message)
 
 
 init : Flags -> (Model, Cmd Msg)
 init flags =
-  ( { lastId = 1
+  let
+      lastId = 1
+  in
+  ( { lastId = lastId
     , users = [ createUser 1 ]
+    , messages = []
     }
-  , Cmd.none
+  , ping lastId
   )
 
 view : Model -> Html Msg
@@ -103,6 +112,14 @@ view model =
             [ onClick CreateUser
             ]
             [ text "Create user" ]
+
+        , div
+            []
+            [ h2 [] [ text "Interop messages" ]
+            , div
+                []
+                ( List.map (\m -> div [] [ text m ]) model.messages )
+            ]
         ]
     ]
 
@@ -111,15 +128,15 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
   case msg of
     CreateUser ->
+      let
+          newLastId = model.lastId + 1
+      in
       (
-        let
-            newLastId = model.lastId + 1
-        in
         { model |
             users = (List.append model.users [(createUser newLastId)])
           , lastId = newLastId
         }
-      , Cmd.none
+      , ping newLastId
       )
 
     RemoveUser userId ->
@@ -129,6 +146,9 @@ update msg model =
       ( { model | users = newUsers }
       , Cmd.none
       )
+
+    Pong message ->
+      ( { model | messages = (List.append model.messages [message])  }, Cmd.none )
 
 main : Program Flags Model Msg
 main =

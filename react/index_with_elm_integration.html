@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>
+      Fooling around with React
+    </title>
+  </head>
+
+  <body>
+    <div id="outlet">
+    </div>
+
+    <script src="https://fb.me/react-0.14.3.min.js"></script>
+    <script src="https://fb.me/react-dom-0.14.3.min.js"></script>
+    <script src="https://unpkg.com/redux@3.7.2/dist/redux.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-redux/5.0.7/react-redux.min.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+    <script src="../elm/app.js"></script>
+
+
+    <script type="text/babel">
+      var firstNames = ['John', 'Peter', 'Debi', 'Alice'];
+      var lastNames = ['Grey', 'Brown', 'Smith', 'Parker'];
+
+      var currentId = 0;
+
+      var getRandomMember = function(list) {
+        return list[Math.floor(Math.random()*list.length)];
+      }
+
+      var createUser = function() {
+        currentId = currentId + 1;
+
+        var firstName = getRandomMember(firstNames);
+        var lastName = getRandomMember(lastNames);
+
+        return { id: currentId, firstName: firstName, lastName: lastName };
+      };
+
+      var ADD = 'ADD';
+      var REMOVE = 'REMOVE';
+
+      var addUser = function(user) {
+        return ({
+          type: ADD,
+          user: user
+        });
+      };
+
+      var removeUser = function(userId) {
+        return ({
+          type: REMOVE,
+          userId: userId
+        });
+      };
+
+      // ----------------- \\
+
+      var createStore = Redux.createStore;
+      var Provider = ReactRedux.Provider;
+      var connect = ReactRedux.connect;
+
+      var initialState = {
+        users: [ createUser() ],
+      }
+
+      var reducer = function(state, action) {
+        if(!state) {
+          return initialState;
+        }
+
+        switch(action.type) {
+          case ADD:
+            return Object.assign({}, state, {users: state.users.concat(action.user)});
+
+          case REMOVE:
+            const newUsers = state.users.filter(function(user) {
+              return user.id != action.userId;
+            });
+
+            return Object.assign({}, state, {users: newUsers});
+
+          default:
+            return state;
+        }
+      }
+
+      var store = createStore(reducer, initialState);
+
+      var ElmWrapper = React.createClass({
+        initialize: function(node) {
+          if (node === null) return;
+          var app = this.props.src.embed(node, this.props.flags);
+
+          if (typeof this.props.ports !== 'undefined') {
+            this.props.ports(app.ports);
+          }
+        },
+
+        shouldComponentUpdate: function(prevProps) {
+          return false;
+        },
+
+        render: function () {
+          return React.createElement('div', { ref: this.initialize });
+        }
+      });
+
+      ReactDOM.render(
+        <ElmWrapper src={Elm.App} />,
+        document.getElementById('outlet')
+      );
+    </script>
+  </body>
+</html>

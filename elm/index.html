@@ -7,6 +7,9 @@
   </head>
 
   <body>
+    <div id="lastIdOutlet">
+    </div>
+
     <div id="outlet">
     </div>
 
@@ -14,9 +17,21 @@
 
     <script>
       var outlet = document.getElementById('outlet');
+      var lastIdOutlet = document.getElementById('lastIdOutlet');
 
-      Elm.App.embed(outlet, {
+      var app = Elm.App.embed(outlet, {
         foo: 'foo'
+      });
+
+      var pong = function(id) {
+        return function() {
+          app.ports.pong.send('Pong ' + id);
+        }
+      }
+
+      app.ports.ping.subscribe(function(lastId) {
+        lastIdOutlet.innerHTML = "Last id in Elm is " + lastId;
+        setTimeout(pong(lastId), 1000);
       });
     </script>
   </body>
